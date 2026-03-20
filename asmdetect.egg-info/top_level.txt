@@ -1,0 +1,6 @@
+asmdetect
+docs
+examples
+notebooks
+scripts
+tests
