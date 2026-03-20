@@ -29,6 +29,12 @@ Built for SOC teams who need fast, explainable triage of suspicious binaries bef
 | Dataset | Arun152k — objdump-disassembled PE binaries |
 | Decision threshold | 0.62 (calibrated on test set) |
 
+## Dataset
+Processed opcode sequences available on Kaggle:
+https://www.kaggle.com/datasets/swarnadharshini/malware-opcodes
+
+Original source: [Arun152k/Malware-Detection-using-N-Gram-Frequency](https://github.com/Arun152k/Malware-Detection-using-N-Gram-Frequency)
+
 ### Test set results
 
 | Metric | Value |
