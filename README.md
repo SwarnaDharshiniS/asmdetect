@@ -4,7 +4,6 @@
 
 [![Model](https://img.shields.io/badge/HuggingFace-Swarnadharshini%2Fcodebert--malware--detector-blue)](https://huggingface.co/Swarnadharshini/codebert-malware-detector)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
 
 A Python library for **static malware detection** using x86 assembly opcode sequences.
 Fine-tunes `microsoft/codebert-base` on disassembled binaries to classify files as
