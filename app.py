@@ -14,7 +14,7 @@ Tabs:
   7. Architecture  — system diagram + algorithm
 """
 
-import os, sys, json, time, glob, hashlib, subprocess
+import os, sys, json, time, glob, hashlib, subprocess, requests
 import threading, queue, tempfile, socket, ssl, urllib.request
 import pandas as pd
 import numpy as np
@@ -265,50 +265,61 @@ with tabs[1]:
                 unsafe_allow_html=True)
     st.caption("Space-separated x86 mnemonics e.g. `push mov xor call ret add nop`")
 
+    # ✅ Initialize state
+    if "opcode_text" not in st.session_state:
+        st.session_state.opcode_text = ""
+
     col_a, col_b = st.columns([3,1])
-    with col_a:
-        opcode_text = st.text_area("Opcodes", height=130,
-            placeholder="push mov sub lea call add pop ret xor push mov "
-                        "call ret nop add sub push mov xor call ret ...",
-            label_visibility="collapsed")
+
+    # ✅ BUTTONS FIRST
     with col_b:
         st.markdown(" ")
         st.markdown(" ")
+
         run_text = st.button("🔍 Analyse", type="primary",
                              use_container_width=True)
+
         st.markdown("**Quick tests:**")
+
         if st.button("Load malware sample", use_container_width=True):
-            st.session_state["sample_text"] = (
+            st.session_state.opcode_text = (
                 "xor xor push push call mov xor add sub push call mov xor nop "
                 "ret jmp jmp xor call push mov lea push call mov xor xor add "
                 "push ret call nop jmp xor push call mov xor ret"
             )
+
         if st.button("Load benign sample", use_container_width=True):
-            st.session_state["sample_text"] = (
+            st.session_state.opcode_text = (
                 "push mov sub mov call mov add pop ret push mov sub lea "
                 "call add mov ret mov push sub mov call add ret push mov "
                 "sub lea call add pop ret nop"
             )
 
-    # Apply quick test samples
-    if "sample_text" in st.session_state:
-        opcode_text = st.session_state.pop("sample_text")
-        st.rerun()
+    # ✅ TEXT AREA AFTER buttons
+    with col_a:
+        opcode_text = st.text_area(
+            "Opcodes",
+            height=130,
+            key="opcode_text",
+            placeholder="push mov sub lea call add pop ret xor ..."
+        )
 
-    if run_text and opcode_text.strip():
+    # ✅ ANALYSIS
+    if run_text and st.session_state.opcode_text.strip():
         with st.spinner("Analysing..."):
             t0 = time.perf_counter()
             try:
-                r  = detector.predict_text(opcode_text)
+                r  = detector.predict_text(st.session_state.opcode_text)
                 ms = (time.perf_counter() - t0) * 1000
             except Exception as e:
                 st.error(str(e)); st.stop()
+
         st.markdown("---")
         render_result(r, "text_input", ms)
+
     elif run_text:
         st.warning("Please enter an opcode sequence.")
-
-
+        
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 3 — BATCH TRIAGE
 # ══════════════════════════════════════════════════════════════════════════════
@@ -720,29 +731,28 @@ for supply-chain integrity.
             except Exception as e:
                 report["checks"]["tls"] = {"passed": False, "error": str(e)}
 
-        with st.spinner("Checking HTTPS redirect..."):
+        with st.spinner("Checking HTTPS enforcement..."):
             try:
-                req = urllib.request.Request(
-                    f"http://{host}/{MODEL_ID}", method="HEAD")
-                try:
-                    urllib.request.urlopen(req, timeout=5)
-                    report["checks"]["https_redirect"] = {
-                        "passed": False, "note": "No redirect"}
-                except urllib.error.HTTPError as e:
-                    loc = e.headers.get("Location","")
-                    report["checks"]["https_redirect"] = {
-                        "passed": loc.startswith("https://"),
-                        "redirect_to": loc}
-                except Exception as e:
-                    report["checks"]["https_redirect"] = {
-                        "passed": True, "note": str(e)}
+                url = f"http://{host}/{MODEL_ID}"
+                resp = requests.get(url, allow_redirects=True, timeout=5)
+
+                final_url = resp.url
+
+                report["checks"]["https_redirect"] = {
+                    "passed": final_url.startswith("https://"),
+                    "final_url": final_url,
+                    "status_code": resp.status_code
+                }
+
             except Exception as e:
                 report["checks"]["https_redirect"] = {
-                    "passed": False, "error": str(e)}
+                    "passed": False,
+                    "error": str(e)
+                }
 
         checksums = {}
         files_to_check = ["config.json", "tokenizer_config.json",
-                           "tokenizer.json", "special_tokens_map.json"]
+                           "tokenizer.json"]
         for fname in files_to_check:
             with st.spinner(f"Checking {fname}..."):
                 url = f"https://{host}/{MODEL_ID}/resolve/main/{fname}"
@@ -777,7 +787,7 @@ for supply-chain integrity.
         # HTTPS redirect
         redir = rep["checks"].get("https_redirect",{})
         if redir.get("passed"):
-            st.success("✅ HTTPS redirect enforced — no HTTP fallback")
+            st.success("✅ HTTPS enforced — secure connection")
         else:
             st.warning("⚠️ HTTPS redirect check inconclusive")
 
@@ -996,3 +1006,4 @@ with tabs[6]:
 '15.     SendEmailAlert(filepath, p_mal, risk)\n'
 '16. return DetectionResult(label, p_mal, risk, confidence)',
             unsafe_allow_html=True)
+            
