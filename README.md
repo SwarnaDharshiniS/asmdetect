@@ -245,3 +245,17 @@ The model was trained on Kaggle (Tesla P100 GPU) using the pipeline in
 - Obfuscated/packed malware that alters opcode distribution may evade detection
 - Designed for x86 Windows PE binaries; accuracy on ARM or ELF is untested
 - Static analysis only — does not detect runtime/memory-resident malware
+
+# AsmDetect
+
+Assembly-level malware detection using CodeBERT.
+
+## Install
+pip install asmdetect
+
+## Usage
+```python
+from asmdetect import MalwareDetector
+
+detector = MalwareDetector.from_pretrained()
+detector.predict_text("push mov xor call")
