@@ -9,67 +9,33 @@ description = "Assembly-level malware detection using fine-tuned CodeBERT"
 readme      = "README.md"
 license     = { text = "MIT" }
 requires-python = ">=3.10"
-authors     = [{ name = "Swarnadharshini" }]
-
-keywords = [
-    "malware-detection", "assembly", "opcodes", "x86",
-    "codebert", "cybersecurity", "static-analysis", "nlp", "transformers"
-]
-
+authors     = [{ name = "Swarnadharshini S" }]
+keywords    = ["malware-detection","assembly","opcodes","codebert","cybersecurity"]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Information Technology",
     "Topic :: Security",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
 ]
-
-dependencies = [
-    "torch>=2.0.0",
-    "transformers>=4.35.0",
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-]
+dependencies = ["torch>=2.0.0","transformers>=4.35.0","numpy>=1.24.0","pandas>=2.0.0"]
 
 [project.optional-dependencies]
-train = [
-    "datasets>=2.14.0",
-    "accelerate>=0.24.0",
-    "evaluate>=0.4.0",
-    "scikit-learn>=1.3.0",
-    "matplotlib>=3.7.0",
-    "tqdm>=4.65.0",
-]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-]
+ui      = ["streamlit>=1.28.0"]
+watcher = ["watchdog>=3.0.0","plyer>=2.1.0"]
+onnx    = ["optimum[onnxruntime]>=1.13.0","onnxruntime>=1.16.0"]
+train   = ["datasets>=2.14.0","accelerate>=0.24.0","scikit-learn>=1.3.0","matplotlib>=3.7.0","tqdm>=4.65.0"]
+all     = ["streamlit>=1.28.0","watchdog>=3.0.0","plyer>=2.1.0","datasets>=2.14.0","accelerate>=0.24.0","scikit-learn>=1.3.0","matplotlib>=3.7.0","tqdm>=4.65.0"]
+dev     = ["pytest>=7.4.0","pytest-cov>=4.1.0"]
 
 [project.scripts]
 asmdetect = "asmdetect.cli:main"
 
 [project.urls]
-Homepage        = "https://huggingface.co/Swarnadharshini/codebert-malware-detector"
-"HuggingFace"   = "https://huggingface.co/Swarnadharshini/codebert-malware-detector"
-"Source Code"   = "https://github.com/Swarnadharshini/asmdetect"
+Homepage    = "https://huggingface.co/Swarnadharshini/codebert-malware-detector"
+"Source"    = "https://github.com/SwarnaDharshiniS/asmdetect"
 
 [tool.setuptools.packages.find]
 where = ["."]
-
-[tool.black]
-line-length    = 100
-target-version = ["py310", "py311", "py312"]
-
-[tool.isort]
-profile     = "black"
-line_length = 100
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
